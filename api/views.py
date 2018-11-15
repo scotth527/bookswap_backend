@@ -4,6 +4,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from api.models import Contact, ContactSerializer
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 class ContactsView(APIView):
     def get(self, request, contact_id=None):
