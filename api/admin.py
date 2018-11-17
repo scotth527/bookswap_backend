@@ -1,4 +1,10 @@
 from django.contrib import admin
 # from api.models import Contact
 # Register your models here.
-# admin.site.register(Contact)
+
+from api.models import Books, Profile, Inventory, Trades
+admin.site.register(Books)
+admin.site.register(Profile)
+admin.site.register(Inventory)
+admin.site.register(Trades)
+

@@ -38,26 +38,57 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 #         contact.delete()
         
 #         return Response(status=status.HTTP_204_NO_CONTENT)
-        
+class BooksView(APIView):
+    def get(self, request, book_id=None):
+        if book_id is not None:
+            book = Books.objects.get(id=book_id)
+            serializer = BooksSerializer(book, many=False)
+            return Response(serializer.data)
+        else:
+            book = Books.objects.all()
+            serializer = BooksSerializer(book, many=True)
+            return Response(serializer.data)
         
 class RequestsView(APIView):
     def get(self, request, profile_id):
-        user_books = Inventory.objects.get(profile=profile_id)
+        user_books = Inventory.objects.get(id=profile_id)
         requests = [user_books.id for user_books in Trades.objects.all()]
         
         return Response(requests)
         
     
-    # def post(self, request):
-        
-        
+    def post(self, request):
+        serializer = TradesSerializer(data=request.data)
+        if serializer.is_valid():
+          serializer.save()
+          return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+
         
 # class TradesView(APIView):
-#     def get(self, request, user_id):
+#     def get(self, request, profile_id):
+#         trader = Trades.objects.get(profile=profile_id)
+#         trades = [ in Trades.objects.all()]
         
         
-#     def put(self, request):
+#     def put(self, request, profile_id):
+#         trade = Trades.objects.get(id=profile_id)
+#          trade.is_accepted = request.data.get("is_accepted")
+#          trade.save()
         
+#          serializer = TradesSerializer(data=request.data)
+#          if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+#          else:
+#             return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
+            
     
-#     def delete(self, request):
+#     def delete(self, request, profile_id):
+#         trade = Trades.objects.get(id=profile_id)
+#         trade.delete()
+        
+#         return Response(status=status.HTTP_204_NO_CONTENT)
         
