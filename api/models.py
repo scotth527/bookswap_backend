@@ -10,6 +10,7 @@ class Books(models.Model):
     genre = models.CharField(max_length=50)
     language = models.CharField(max_length=50)
     description = models.CharField(max_length=1000)
+    image = models.CharField(max_length=1000, default="https://images.gr-assets.com/books/1388190055l/10048834.jpg")
     
 
 class Profile(models.Model):
