@@ -21,9 +21,11 @@ urlpatterns = [
     # path('profile/<int:profile_id>', views.ProfileView.as_view(), name='id-users'),
     # path('contacts/', views.ContactsView.as_view(), name='all-contacts'),
     path('login/', obtain_jwt_token),
-    path('request/<int:profile_id>', views.RequestsView.as_view(), name='profile_id'),
+    path('request/', views.RequestsView.as_view(), name="add-request"),
+    path('request/<int:given_id>', views.RequestsView.as_view(), name='given_id'),
     path('books/<int:book_id>', views.BooksView.as_view(), name='books_id'),
-    path('books/',views.BooksView.as_view(), name='all-books')
+    path('books/',views.BooksView.as_view(), name='all-books'),
+    path('profile/<int:profile_id>', views.ProfileView.as_view(), name='profile_id')
     #path('trades/<int:profile_id>', views.TradesView.as_view(), name='trade_id')
     # path('trade/<int:profile_id>', views.TradesView.as_view(), name=''),
 ]

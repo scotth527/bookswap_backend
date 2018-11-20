@@ -63,6 +63,8 @@ class TradesSerializer(serializers.ModelSerializer):
         model = Trades
         exclude = ()
         
+        
+        
 # class WishlistSerializer(serializers.ModelSerializer):
 #     class Meta: 
 #         model = Wishlist
