@@ -57,6 +57,23 @@ class RequestsView(APIView):
         trades = TradesSerializer(user_books, many=True)
         return Response(trades.data)
         
+    def put(self, request, given_id):
+        trade = Trades.objects.get(id=given_id)
+        serializer = TradesSerializer(trade, request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post(self, request):
+        serializer = TradesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
 
 class ProfileView(APIView):
     def get(self, request, profile_id, book_id):
