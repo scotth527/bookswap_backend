@@ -48,8 +48,41 @@ class BooksView(APIView):
             book = Books.objects.all()
             serializer = BooksSerializer(book, many=True)
             return Response(serializer.data)
+            
+
+class ProfileView(APIView):
+    def get(self, request, profile_id):
+        profile = Profile.objects.get(id=profile_id)
+        serializer = ProfileSerializer(profile, many=False)
+        return Response(serializer.data)
+            
+    def put(self, request, profile_id):
+         profile = Profile.objects.get(id=profile_id)
+         profile.address = request.data.get("address")
+         profile.birthday = request.data.get("birthday")
+         profile.favorite_genre = request.data.get("favorite_genre")
+         profile.address = request.data.get("address")
+         profile.save()
+         
+    def patch(self, request, profile_id):
+        profile = Profile.objects.get(id=profile_id)
+        serializer = ProfileSerializer(profile, data=request.data, partial=True)
+        serializer.save()
+    
+    def delete(self, request, profile_id):
+        profile = Profile.objects.get(id=profile_id)
+        profile.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
         
-class RequestsView(APIView):
+        
+class LibraryView(APIView):
+    def get(self,request, profile_id):
+        library = Profile.library.objects.get(id=profile_id)
+        serializer = ProfileSerializer(library, many=true)
+        return Response(serializer.data)
+        
+        
+class TradesView(APIView):
     serializer_class = TradesSerializer
     
     def get(self, request, given_id):
@@ -73,42 +106,13 @@ class RequestsView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
-
-class ProfileView(APIView):
-    def get(self, request, profile_id):
-        profile = Profile.objects.get(id=profile_id)
-        serializer = ProfileSerializer(profile, many=False)
-        return Response(serializer.data)
-            
-    def put(self, request, profile_id):
-         profile = Profile.objects.get(id=profile_id)
-         profile.address = request.data.get("address")
-         profile.birthday = request.data.get("birthday")
-         profile.favorite_genre = request.data.get("favorite_genre")
-         profile.address = request.data.get("address")
-         profile.save()
-    
-    def delete(self, request, profile_id):
-        profile = Profile.objects.get(id=profile_id)
-        profile.delete()
-        
-        return Response(status=status.HTTP_204_NO_CONTENT)
-        
-class LibraryView(APIView):
-    def get(self,request, profile_id):
-        library = Profile.library.objects.get(id=profile_id)
-        serializer = ProfileSerializer(library, many=true)
-        return Response(serializer.data)
-        
-        
 
         
- #class TradesView(APIView):
-#     def get(self, request, profile_id):
-#         trader = Trades.objects.get(profile=profile_id)
-#         trades = [ in Trades.objects.all()]
-        
+class RequestsView(APIView):
+    def get(self, request, given_id):
+        user_books = Trades.objects.filter(receiver__profile=given_id)
+        trades = TradesSerializer(user_books, many=True)
+        return Response(trades.data)
         
     def put(self, request, profile_id):
         trade = Trades.objects.get(id=profile_id)
