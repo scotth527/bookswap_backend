@@ -14,6 +14,8 @@ class Books(models.Model):
     
 
 class Profile(models.Model):
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     address = models.CharField(max_length=50)
     birthday = models.CharField(max_length=50)
     favorite_genre = models.CharField(max_length=50)
