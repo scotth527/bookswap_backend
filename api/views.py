@@ -55,6 +55,7 @@ class ProfileView(APIView):
         profile = Profile.objects.get(id=profile_id)
         serializer = ProfileSerializer(profile, many=False)
         return Response(serializer.data)
+        
             
     def put(self, request, profile_id):
          profile = Profile.objects.get(id=profile_id)
@@ -78,8 +79,10 @@ class ProfileView(APIView):
 class LibraryView(APIView):
     def get(self,request, profile_id):
         library = Profile.library.objects.get(id=profile_id)
-        serializer = ProfileSerializer(library, many=true)
+        serializer = ProfileSerializer(library, many=True)
         return Response(serializer.data)
+        
+    
         
         
 class TradesView(APIView):
