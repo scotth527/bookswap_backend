@@ -77,12 +77,26 @@ class ProfileView(APIView):
         
         
 class LibraryView(APIView):
+    serializer_class = InventorySerializer
+    
     def get(self,request, profile_id):
-        library = Profile.library.objects.get(id=profile_id)
-        serializer = ProfileSerializer(library, many=True)
+        library = Inventory.objects.filter(profile=profile_id)
+        serializer = InventorySerializer(library, many=True)
         return Response(serializer.data)
         
-    
+    def post(self, request):
+        serializer = InventorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+    def delete(self, request, profile_id):
+        inventory = Inventory.objects.get(id=profile_id)
+        inventory.delete()
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
         
         
 class TradesView(APIView):

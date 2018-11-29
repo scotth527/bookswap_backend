@@ -27,6 +27,7 @@ urlpatterns = [
     path('books/<int:book_id>', views.BooksView.as_view(), name='books_id'),
     path('books/', views.BooksView.as_view(), name='all-books'),
     path('library/<int:profile_id>', views.LibraryView.as_view(), name='person_library'),
+    path('library/', views.LibraryView.as_view(), name='library'),
     path('profile/<int:profile_id>', views.ProfileView.as_view(), name='profile_id')
     #path('trades/<int:profile_id>', views.TradesView.as_view(), name='trade_id')
     # path('trade/<int:profile_id>', views.TradesView.as_view(), name=''),
