@@ -17,7 +17,7 @@ class Profile(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     address = models.CharField(max_length=50)
-    birthday = models.CharField(max_length=50)
+    birthday = models.DateField(auto_now=False, auto_now_add=False)
     favorite_genre = models.CharField(max_length=50)
     library = models.ManyToManyField(
         Books,
@@ -42,6 +42,7 @@ class Profile(models.Model):
 class Inventory(models.Model):
     book = models.ForeignKey(Books, on_delete=models.CASCADE)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
 
 class Trades(models.Model):
     trader = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name="trader")
