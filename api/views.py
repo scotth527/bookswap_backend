@@ -76,9 +76,16 @@ class ProfileView(APIView):
         
         
 class LibraryView(APIView):
-    def get(self,request, profile_id):
-        library = Profile.library.objects.get(id=profile_id)
-        serializer = ProfileSerializer(library, many=true)
+    def get(self, request, profile_id):
+        library = Inventory.objects.filter(profile=profile_id)
+        serializer = InventorySerializer(library, many=True)
+        return Response(serializer.data)
+
+
+class PageView(APIView):   
+    def get(self, request, book_id):
+        owners = Inventory.objects.filter(book__api_id=book_id)
+        serializer = InventorySerializer(owners, many=True)
         return Response(serializer.data)
         
         
