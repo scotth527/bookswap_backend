@@ -51,43 +51,94 @@ class BooksView(APIView):
             
 
 class ProfileView(APIView):
-    def get(self, request, profile_id):
-        profile = Profile.objects.get(id=profile_id)
-        serializer = ProfileSerializer(profile, many=False)
-        return Response(serializer.data)
+    def get(self, request, profile_id=None):
+        if profile_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                profile = Profile.objects.get(id=profile_id)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = ProfileSerializer(profile, many=False)
+            return Response(serializer.data)
         
             
-    def put(self, request, profile_id):
-         profile = Profile.objects.get(id=profile_id)
-         profile.address = request.data.get("address")
-         profile.birthday = request.data.get("birthday")
-         profile.favorite_genre = request.data.get("favorite_genre")
-         profile.address = request.data.get("address")
-         profile.save()
+    def put(self, request, profile_id=None):
+        if profile_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                profile = Profile.objects.get(id=profile_id)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+                
+            profile.address = request.data.get("address")
+            profile.birthday = request.data.get("birthday")
+            profile.favorite_genre = request.data.get("favorite_genre")
+            profile.address = request.data.get("address")
+            profile.save()
+            return Response(status=status.HTTP_200_OK)
          
-    def patch(self, request, profile_id):
-        profile = Profile.objects.get(id=profile_id)
-        serializer = ProfileSerializer(profile, data=request.data, partial=True)
-        serializer.save()
+    def patch(self, request, profile_id=None):
+        if profile_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                profile = Profile.objects.get(id=profile_id)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+                
+            serializer = ProfileSerializer(profile, data=request.data, partial=True)
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def delete(self, request, profile_id):
-        profile = Profile.objects.get(id=profile_id)
-        profile.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def delete(self, request, profile_id=None):
+        if profile_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                profile = Profile.objects.get(id=profile_id)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+                
+            profile.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
         
         
 class LibraryView(APIView):
-    def get(self, request, profile_id):
-        library = Inventory.objects.filter(profile=profile_id)
-        serializer = InventorySerializer(library, many=True)
-        return Response(serializer.data)
+    def get(self, request, profile_id=None):
+        if profile_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                library = Inventory.objects.filter(profile=profile_id)
+            except Inventory.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+                
+            serializer = InventorySerializer(library, many=True)
+            return Response(serializer.data)
 
 
 class PageView(APIView):   
-    def get(self, request, book_id):
-        owners = Inventory.objects.filter(book__api_id=book_id)
-        serializer = InventorySerializer(owners, many=True)
-        return Response(serializer.data)
+    def get(self, request, book_id=None):
+        if book_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                owners = Inventory.objects.filter(book__api_id=book_id)
+            except Inventory.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+                
+        if owners is not None:
+            serializer = InventorySerializer(owners, many=True)
+            return Response(serializer.data)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         
     def post(self, request):
         serializer = InventorySerializer(data=request.data)

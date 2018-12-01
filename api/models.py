@@ -50,7 +50,7 @@ class Trades(models.Model):
     is_accepted = models.BooleanField(default=False)
         
 class ProfileSerializer(serializers.ModelSerializer):
-    wishlist = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=Profile.objects.all())
+    wishlist = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=Books.objects.all())
     
     class Meta:
         model = Profile
