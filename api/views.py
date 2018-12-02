@@ -6,6 +6,7 @@ from rest_framework.response import Response
 # from api.models import Contact, ContactSerializer
 from api.models import Books, Profile, Inventory, Trades
 from api.models import BooksSerializer, ProfileSerializer, InventorySerializer, TradesSerializer
+# from api.models import WishlistSerializer, InterestedBooks
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -38,6 +39,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 #         contact.delete()
         
 #         return Response(status=status.HTTP_204_NO_CONTENT)
+
 class BooksView(APIView):
     def get(self, request, book_id=None):
         if book_id is not None:
@@ -61,6 +63,7 @@ class ProfileView(APIView):
          profile = Profile.objects.get(id=profile_id)
          profile.address = request.data.get("address")
          profile.birthday = request.data.get("birthday")
+         profile.wishlist.set(request.data.get("wishlist"))
          profile.favorite_genre = request.data.get("favorite_genre")
          profile.address = request.data.get("address")
          profile.save()
@@ -92,11 +95,31 @@ class LibraryView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-    def delete(self, request, profile_id):
-        inventory = Inventory.objects.get(id=profile_id)
-        inventory.delete()
+    def delete(self, request, profile_id=None):
+        if profile_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                inventory = Inventory.objects.get(id=profile_id)
+            except Inventory.DoesNotExist:
+                return Response(Status=status.HTTP_404_NOT_FOUND)
+            
+            inventory.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
         
-        return Response(status=status.HTTP_204_NO_CONTENT)
+# class WishlistView(APIVIew):
+#     serializer_class = ProfileSerializer
+    
+    
+    #partial=true
+        
+# class WishlistView(APIView):
+#     serializer_class = WishlistSerializer
+    
+#     def get(self, request, profile_id):
+#         wishlist = InterestedBooks.objects.filter(profile=profile_id)
+#         serializer = WishlistSerializer(wishlist, many=True)
+#         return Response(serializer.data)
         
         
 class TradesView(APIView):

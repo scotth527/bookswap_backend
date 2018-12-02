@@ -28,6 +28,8 @@ class Profile(models.Model):
     wishlist = models.ManyToManyField(
         Books,
         blank=True,
+        # related_name="wanted_books",
+        # through='InterestedBooks',
     )
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -38,7 +40,11 @@ class Profile(models.Model):
 # class Wishlist(models.Model):
 #     book_id = models.ForeignKey('Books', on_delete=models.CASCADE)
 
-
+# # class InterestedBooks(models.Model):
+#     book = models.ForeignKey(Books, on_delete=models.CASCADE)
+#     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    
+    
 class Inventory(models.Model):
     book = models.ForeignKey(Books, on_delete=models.CASCADE)
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
@@ -48,9 +54,11 @@ class Trades(models.Model):
     trader = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name="trader")
     requester = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name="requester")
     is_accepted = models.BooleanField(default=False)
-        
+
+
+
+
 class ProfileSerializer(serializers.ModelSerializer):
-    wishlist = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=Profile.objects.all())
     
     class Meta:
         model = Profile
@@ -67,7 +75,10 @@ class TradesSerializer(serializers.ModelSerializer):
         exclude = ()
         
         
-        
+# class WishlistSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = InterestedBooks
+#         exclude = ()
 # class WishlistSerializer(serializers.ModelSerializer):
 #     class Meta: 
 #         model = Wishlist
