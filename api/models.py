@@ -59,7 +59,8 @@ class Trades(models.Model):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    
+
+    wishlist = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=Books.objects.all())
     class Meta:
         model = Profile
         exclude = ()

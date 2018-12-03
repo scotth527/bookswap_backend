@@ -26,11 +26,14 @@ urlpatterns = [
     path('trades/<int:given_id>', views.TradesView.as_view(), name='given_id'),
     path('books/<int:book_id>', views.BooksView.as_view(), name='books_id'),
     path('books/', views.BooksView.as_view(), name='all-books'),
+    path('inv/<int:profile_id>', views.LibraryView.as_view(), name='inventory'),
+    path('page/<int:book_id>', views.PageView.as_view(), name='bookpage'),
     path('library/<int:profile_id>', views.LibraryView.as_view(), name='person_library'),
     path('library/', views.LibraryView.as_view(), name='library'),
     # path('wishlist/<int:profile_id>', views.WishlistView.as_view(), name='person_wishlist'),
     # path('wishlist/', views.WishlistView.as_view(), name='all_wishlist'),
     path('profile/<int:profile_id>', views.ProfileView.as_view(), name='profile_id'),
+
     #path('trades/<int:profile_id>', views.TradesView.as_view(), name='trade_id')
     # path('trade/<int:profile_id>', views.TradesView.as_view(), name=''),
 ]
