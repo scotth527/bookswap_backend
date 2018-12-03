@@ -125,7 +125,19 @@ class LibraryView(APIView):
                 
             serializer = InventorySerializer(library, many=True)
             return Response(serializer.data)
-
+            
+    def delete(self, request, profile_id=None):
+        if profile_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                inventory = Inventory.objects.get(id=profile_id)
+            except Inventory.DoesNotExist:
+                return Response(Status=status.HTTP_404_NOT_FOUND)
+            
+            inventory.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        
 
 class PageView(APIView):   
     def get(self, request, book_id=None):
@@ -151,18 +163,7 @@ class PageView(APIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             
-    def delete(self, request, profile_id=None):
-        if profile_id is None:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            try:
-                inventory = Inventory.objects.get(id=profile_id)
-            except Inventory.DoesNotExist:
-                return Response(Status=status.HTTP_404_NOT_FOUND)
-            
-            inventory.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        
+    
 # class WishlistView(APIVIew):
 #     serializer_class = ProfileSerializer
     
