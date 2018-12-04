@@ -10,6 +10,7 @@ from api.models import BooksSerializer, ProfileSerializer, InventorySerializer, 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.contrib.auth import authenticate, login
 
 # class ContactsView(APIView):
 #     def get(self, request, contact_id=None):
@@ -51,6 +52,29 @@ class BooksView(APIView):
             serializer = BooksSerializer(book, many=True)
             return Response(serializer.data)
             
+class LoginView(APIView):
+    def get(self, request):
+        user = request.GET['user']
+        
+        if user is not None:
+            try:
+                profile = Profile.objects.get(user=user)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+            
+            serializer = ProfileSerializer(profile, many=False)
+            return Response(serializer.data)
+        
+    
+    def post(self, request):
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class ProfileView(APIView):
     def get(self, request, profile_id=None):
@@ -137,6 +161,14 @@ class LibraryView(APIView):
             
             inventory.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+            
+    def post(self, request):
+        serializer = InventorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
 class PageView(APIView):   
@@ -155,13 +187,7 @@ class PageView(APIView):
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
         
-    def post(self, request):
-        serializer = InventorySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+   
             
     
 # class WishlistView(APIVIew):
