@@ -5,7 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 # from api.models import Contact, ContactSerializer
 from api.models import Books, Profile, Inventory, Trades
-from api.models import BooksSerializer, ProfileSerializer, InventorySerializer, TradesSerializer
+from api.models import BooksSerializer, ProfileSerializer, InventorySerializer, TradesSerializer, TradeProfileSerializer
 # from api.models import WishlistSerializer, InterestedBooks
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -177,12 +177,28 @@ class PageView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             try:
-                owners = Inventory.objects.filter(book__api_id=book_id)
-            except Inventory.DoesNotExist:
+                owners = Profile.objects.filter(library__exact=book_id)
+            except Profile.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
                 
         if owners is not None:
-            serializer = InventorySerializer(owners, many=True)
+            serializer = TradeProfileSerializer(owners, many=True)
+            return Response(serializer.data)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+            
+class WishersView(APIView):
+    def get(self, request, book_id=None):
+        if book_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                wishers = Profile.objects.filter(wishlist__exact=book_id)
+            except Profile.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+                
+        if wishers is not None:
+            serializer = ProfileSerializer(owners, many=True)
             return Response(serializer.data)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
