@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.db import models
 from django.conf import settings
+from django.contrib.auth.models import User
 
 # Create your models here. 
 class Books(models.Model):
@@ -17,6 +18,8 @@ class Profile(models.Model):
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     address = models.CharField(max_length=50)
+    city = models.CharField(max_length=50, default="Miami")
+    state = models.CharField(max_length=50, default="FL")
     birthday = models.DateField(auto_now=False, auto_now_add=False)
     favorite_genre = models.CharField(max_length=50)
     library = models.ManyToManyField(
@@ -56,10 +59,20 @@ class Trades(models.Model):
     is_accepted = models.BooleanField(default=False)
 
 
-
-
+class UserSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+        
 class ProfileSerializer(serializers.ModelSerializer):
+    wishlist = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=Books.objects.all())
+    class Meta:
+        model = Profile
+        exclude = ()
 
+class TradeProfileSerializer(serializers.ModelSerializer):
+    user=UserSerializer()
     wishlist = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=Books.objects.all())
     class Meta:
         model = Profile
@@ -75,6 +88,7 @@ class TradesSerializer(serializers.ModelSerializer):
         model = Trades
         exclude = ()
         
+
         
 # class WishlistSerializer(serializers.ModelSerializer):
 #     class Meta:

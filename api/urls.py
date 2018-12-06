@@ -33,6 +33,7 @@ urlpatterns = [
     # path('wishlist/<int:profile_id>', views.WishlistView.as_view(), name='person_wishlist'),
     # path('wishlist/', views.WishlistView.as_view(), name='all_wishlist'),
     path('profile/<int:profile_id>', views.ProfileView.as_view(), name='profile_id'),
+    path('wishers/<int:book_id>',views.WishersView.as_view(), name='wishers')
 
     #path('trades/<int:profile_id>', views.TradesView.as_view(), name='trade_id')
     # path('trade/<int:profile_id>', views.TradesView.as_view(), name=''),
