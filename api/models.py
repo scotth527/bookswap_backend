@@ -46,7 +46,12 @@ class Profile(models.Model):
 # # class InterestedBooks(models.Model):
 #     book = models.ForeignKey(Books, on_delete=models.CASCADE)
 #     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-    
+          
+class BooksSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Books
+        exclude = ()
+        
     
 class Inventory(models.Model):
     book = models.ForeignKey(Books, on_delete=models.CASCADE)
@@ -60,28 +65,50 @@ class Trades(models.Model):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    
     class Meta:
         model = User
         fields = ('username', 'email')
         
+        
 class ProfileSerializer(serializers.ModelSerializer):
     wishlist = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=Books.objects.all())
+    
     class Meta:
         model = Profile
         exclude = ()
+        
 
 class TradeProfileSerializer(serializers.ModelSerializer):
     user=UserSerializer()
     wishlist = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=Books.objects.all())
+    
     class Meta:
         model = Profile
         exclude = ()
+        
 
 class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
         exclude = ()
+        
+        
+class TradeInventorySerializer(serializers.ModelSerializer):
+    book = BooksSerializer()
+    
+    class Meta:
+        model = Inventory
+        exclude = ()
+        
+        
+class TradeViewInventorySerializer(serializers.ModelSerializer):
+    book = BooksSerializer()
+    profile = TradeProfileSerializer()
+    
+    class Meta:
+        model = Inventory
+        exclude = ()        
+        
       
 class TradesSerializer(serializers.ModelSerializer):
     class Meta:
@@ -89,6 +116,14 @@ class TradesSerializer(serializers.ModelSerializer):
         exclude = ()
         
 
+class TradesViewSerializer(serializers.ModelSerializer):
+    trader = TradeViewInventorySerializer()
+    requester = TradeViewInventorySerializer()
+    
+    class Meta:
+        model = Trades
+        exclude = () 
+ 
         
 # class WishlistSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -103,10 +138,6 @@ class TradesSerializer(serializers.ModelSerializer):
 #     class Meta:
 #         model = PersonalInventory
 #         exclude = ()
-        
-class BooksSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Books
-        exclude = ()
+
         
         

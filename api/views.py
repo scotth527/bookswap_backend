@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 # from api.models import Contact, ContactSerializer
 from api.models import Books, Profile, Inventory, Trades
-from api.models import BooksSerializer, ProfileSerializer, InventorySerializer, TradesSerializer, TradeProfileSerializer
+from api.models import BooksSerializer, ProfileSerializer, InventorySerializer, TradesSerializer
+from api.models import TradeProfileSerializer, TradeInventorySerializer, TradesViewSerializer
 # from api.models import WishlistSerializer, InterestedBooks
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -147,7 +148,7 @@ class LibraryView(APIView):
             except Inventory.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
                 
-            serializer = InventorySerializer(library, many=True)
+            serializer = TradeInventorySerializer(library, many=True)
             return Response(serializer.data)
             
     def delete(self, request, profile_id=None):
@@ -186,7 +187,8 @@ class PageView(APIView):
             return Response(serializer.data)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-            
+
+
 class WishersView(APIView):
     def get(self, request, book_id=None):
         if book_id is None:
@@ -202,8 +204,20 @@ class WishersView(APIView):
             return Response(serializer.data)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
-   
+
+  
+class InventoryView(APIView):
+    def get(self, request, book_id=None, profile_id=None):
+        if book_id is None or profile_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                owned_book = Inventory.objects.get(book=book_id, profile=profile_id)
+            except Inventory.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+                
+            serializer = InventorySerializer(owned_book, many=False)
+            return Response(serializer.data)
             
     
 # class WishlistView(APIVIew):
@@ -226,7 +240,7 @@ class TradesView(APIView):
     
     def get(self, request, given_id):
         user_books = Trades.objects.filter(trader__profile=given_id)
-        trades = TradesSerializer(user_books, many=True)
+        trades = TradesViewSerializer(user_books, many=True)
         return Response(trades.data)
         
     def put(self, request, given_id):
