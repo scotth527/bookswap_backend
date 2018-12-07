@@ -82,8 +82,18 @@ class InventorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Inventory
         exclude = ()
+        
+class TradeInventorySerializer(serializers.ModelSerializer):
+    profile = TradeProfileSerializer()
+    
+    class Meta:
+        model = Inventory
+        exclude = ()
       
 class TradesSerializer(serializers.ModelSerializer):
+    trader = TradeInventorySerializer()
+    requester = TradeInventorySerializer()
+    
     class Meta:
         model = Trades
         exclude = ()

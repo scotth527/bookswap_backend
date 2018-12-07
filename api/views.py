@@ -198,7 +198,7 @@ class WishersView(APIView):
                 return Response(status=status.HTTP_404_NOT_FOUND)
                 
         if wishers is not None:
-            serializer = ProfileSerializer(owners, many=True)
+            serializer = TradeProfileSerializer(wishers, many=True)
             return Response(serializer.data)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -229,14 +229,22 @@ class TradesView(APIView):
         trades = TradesSerializer(user_books, many=True)
         return Response(trades.data)
         
-    def put(self, request, given_id):
-        trade = Trades.objects.get(id=given_id)
-        serializer = TradesSerializer(trade, request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+    def patch(self, request, given_id):
+        if given_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            try:
+                trade = Trades.objects.get(id=given_id)
+            except Trades.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+                
+            serializer = TradeProfileSerializer(trade, data=request.data, partial=True)
+            
+            if serializer.is_valid():
+                serializer.save()
+                return Response(status=status.HTTP_200_OK)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def post(self, request):
         serializer = TradesSerializer(data=request.data)
@@ -245,6 +253,12 @@ class TradesView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+    def delete(self, request, given_id):
+        trade = Trades.objects.get(id=given_id)
+        trade.delete()
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
         
 class RequestsView(APIView):
