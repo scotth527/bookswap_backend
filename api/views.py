@@ -5,43 +5,24 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 # from api.models import Contact, ContactSerializer
 from api.models import Books, Profile, Inventory, Trades
-from api.models import BooksSerializer, ProfileSerializer, InventorySerializer, TradesSerializer, TradeProfileSerializer
+from api.models import BooksSerializer, ProfileSerializer, InventorySerializer, TradesSerializer
+from api.models import TradeProfileSerializer, TradeInventorySerializer, TradesViewSerializer
 # from api.models import WishlistSerializer, InterestedBooks
-from drf_yasg import openapi
-from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate, login
-
-# class ContactsView(APIView):
-#     def get(self, request, contact_id=None):
-
-#         if contact_id is not None:
-#             contact = Contact.objects.get(id=contact_id)
-#             serializer = ContactSerializer(contact, many=False)
-#             return Response(serializer.data)
-#         else:
-#             contacts = Contact.objects.all()
-#             serializer = ContactSerializer(contacts, many=True)
-#             return Response(serializer.data)
-        
-#     def post(self, request):
-            
-#         serializer = ContactSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_200_OK)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-            
-        
-#     def delete(self, request, contact_id):
-        
-#         contact = Contact.objects.get(id=contact_id)
-#         contact.delete()
-        
-#         return Response(status=status.HTTP_204_NO_CONTENT)
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 
 class BooksView(APIView):
+    """
+    get:
+    Return a list of all books 
+    """
+    
+    @swagger_auto_schema(
+        responses={ status.HTTP_200_OK : BooksSerializer(many=True)}
+    )
+    
     def get(self, request, book_id=None):
         if book_id is not None:
             book = Books.objects.get(id=book_id)
@@ -53,6 +34,18 @@ class BooksView(APIView):
             return Response(serializer.data)
             
 class LoginView(APIView):
+    """
+    get:
+    Return information about a particular profile.
+    
+    post:
+    Authenticate user
+    """
+    
+    @swagger_auto_schema(
+        responses={ status.HTTP_200_OK : ProfileSerializer(many=False)}
+    )
+    
     def get(self, request):
         user = request.GET['user']
         
@@ -77,6 +70,25 @@ class LoginView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 class ProfileView(APIView):
+    """
+    get:
+    Return information about a specific user
+    
+    put:
+    Update user information
+    
+    patch: 
+    Used to update the user's wishlist
+    
+    delete: 
+    Delete user profile
+    
+    """
+    
+    @swagger_auto_schema(
+        responses={ status.HTTP_200_OK : ProfileSerializer(many=False)}
+    )
+    
     def get(self, request, profile_id=None):
         if profile_id is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -88,7 +100,13 @@ class ProfileView(APIView):
             
             serializer = ProfileSerializer(profile, many=False)
             return Response(serializer.data)
-        
+    
+    @swagger_auto_schema(
+        responses={
+        status.HTTP_200_OK : ProfileSerializer,
+        status.HTTP_400_BAD_REQUEST : openapi.Response(description="Missing information")
+        }
+    )   
             
 
     def put(self, request, profile_id=None):
@@ -124,6 +142,10 @@ class ProfileView(APIView):
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @swagger_auto_schema(
+        response={status.HTTP_204_NO_CONTENT}
+        )
+        
     def delete(self, request, profile_id=None):
         if profile_id is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -138,6 +160,11 @@ class ProfileView(APIView):
         
         
 class LibraryView(APIView):
+    
+    @swagger_auto_schema(
+        responses={ status.HTTP_200_OK : TradeInventorySerializer(many=True)}
+    )
+    
     def get(self, request, profile_id=None):
         if profile_id is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -147,8 +174,12 @@ class LibraryView(APIView):
             except Inventory.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
                 
-            serializer = InventorySerializer(library, many=True)
+            serializer = TradeInventorySerializer(library, many=True)
             return Response(serializer.data)
+    
+    @swagger_auto_schema(
+        response={status.HTTP_204_NO_CONTENT}
+        )
             
     def delete(self, request, profile_id=None):
         if profile_id is None:
@@ -172,6 +203,11 @@ class LibraryView(APIView):
         
 
 class PageView(APIView):   
+    
+    @swagger_auto_schema(
+        responses={ status.HTTP_200_OK : TradeProfileSerializer(many=True)}
+    )
+    
     def get(self, request, book_id=None):
         if book_id is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -186,8 +222,14 @@ class PageView(APIView):
             return Response(serializer.data)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-            
+
+
 class WishersView(APIView):
+    
+    @swagger_auto_schema(
+        responses={ status.HTTP_200_OK : TradeProfileSerializer(many=True)}
+    )
+    
     def get(self, request, book_id=None):
         if book_id is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -202,8 +244,25 @@ class WishersView(APIView):
             return Response(serializer.data)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        
-   
+
+  
+class InventoryView(APIView):
+    
+    @swagger_auto_schema(
+        responses={ status.HTTP_200_OK : InventorySerializer(many=True)}
+    )
+    
+    def get(self, request, book_id=None, profile_id=None):
+        if book_id is None or profile_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                owned_book = Inventory.objects.get(book=book_id, profile=profile_id)
+            except Inventory.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
+                
+            serializer = InventorySerializer(owned_book, many=False)
+            return Response(serializer.data)
             
     
 # class WishlistView(APIVIew):
@@ -224,9 +283,13 @@ class WishersView(APIView):
 class TradesView(APIView):
     serializer_class = TradesSerializer
     
+    @swagger_auto_schema(
+        responses={ status.HTTP_200_OK : TradesViewSerializer(many=True)}
+    )
+    
     def get(self, request, given_id):
         user_books = Trades.objects.filter(trader__profile=given_id)
-        trades = TradesSerializer(user_books, many=True)
+        trades = TradesViewSerializer(user_books, many=True)
         return Response(trades.data)
         
     def patch(self, request, given_id):
@@ -238,7 +301,7 @@ class TradesView(APIView):
             except Trades.DoesNotExist:
                 return Response(status=status.HTTP_404_NOT_FOUND)
                 
-            serializer = TradeProfileSerializer(trade, data=request.data, partial=True)
+            serializer = TradesSerializer(trade, data=request.data, partial=True)
             
             if serializer.is_valid():
                 serializer.save()
@@ -253,6 +316,10 @@ class TradesView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+     
+    @swagger_auto_schema(
+        response={status.HTTP_204_NO_CONTENT}
+        ) 
             
     def delete(self, request, given_id):
         trade = Trades.objects.get(id=given_id)
@@ -262,6 +329,11 @@ class TradesView(APIView):
 
         
 class RequestsView(APIView):
+    
+    @swagger_auto_schema(
+        responses={ status.HTTP_200_OK : TradesSerializer(many=True)}
+    )
+    
     def get(self, request, given_id):
         user_books = Trades.objects.filter(receiver__profile=given_id)
         trades = TradesSerializer(user_books, many=True)
@@ -278,7 +350,10 @@ class RequestsView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.data, status=status.HTTP_400_BAD_REQUEST)
-            
+    
+    @swagger_auto_schema(
+        response={status.HTTP_204_NO_CONTENT}
+        )       
     
     def delete(self, request, profile_id):
         trade = Trades.objects.get(id=profile_id)
