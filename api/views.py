@@ -124,7 +124,14 @@ class ProfileView(APIView):
             profile.address = request.data.get("address")
             profile.save()
             return Response(status=status.HTTP_200_OK)
-
+    
+    @swagger_auto_schema(
+        responses={
+        status.HTTP_200_OK : ProfileSerializer,
+        status.HTTP_400_BAD_REQUEST : openapi.Response(description="Missing information")
+        }
+    )   
+    
     def patch(self, request, profile_id=None):
         if profile_id is None:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -161,6 +168,18 @@ class ProfileView(APIView):
         
 class LibraryView(APIView):
     
+    """
+    get:
+    Return the inventory of the user
+    
+    delete: 
+    Remove a book from the users inventory
+    
+    post:
+    Add a book to the users inventory
+    
+    """
+    
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : TradeInventorySerializer(many=True)}
     )
@@ -192,6 +211,14 @@ class LibraryView(APIView):
             
             inventory.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @swagger_auto_schema(
+        request_body=InventorySerializer,
+        responses={
+            status.HTTP_200_OK : InventorySerializer,
+            status.HTTP_400_BAD_REQUEST: openapi.Response(description="Missing information")
+            }
+        )
             
     def post(self, request):
         serializer = InventorySerializer(data=request.data)
@@ -203,6 +230,12 @@ class LibraryView(APIView):
         
 
 class PageView(APIView):   
+    
+    """
+    get: 
+    Return information about users who own the book_id 
+    
+    """
     
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : TradeProfileSerializer(many=True)}
@@ -226,6 +259,11 @@ class PageView(APIView):
 
 class WishersView(APIView):
     
+    """
+    get:
+    Return information on users who have the specified book on their wishlist
+    """
+    
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : TradeProfileSerializer(many=True)}
     )
@@ -246,23 +284,19 @@ class WishersView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
   
-class InventoryView(APIView):
+# class InventoryView(APIView):
     
-    @swagger_auto_schema(
-        responses={ status.HTTP_200_OK : InventorySerializer(many=True)}
-    )
-    
-    def get(self, request, book_id=None, profile_id=None):
-        if book_id is None or profile_id is None:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        else:
-            try:
-                owned_book = Inventory.objects.get(book=book_id, profile=profile_id)
-            except Inventory.DoesNotExist:
-                return Response(status=status.HTTP_404_NOT_FOUND)
+#     def get(self, request, book_id=None, profile_id=None):
+#         if book_id is None or profile_id is None:
+#             return Response(status=status.HTTP_400_BAD_REQUEST)
+#         else:
+#             try:
+#                 owned_book = Inventory.objects.get(book=book_id, profile=profile_id)
+#             except Inventory.DoesNotExist:
+#                 return Response(status=status.HTTP_404_NOT_FOUND)
                 
-            serializer = InventorySerializer(owned_book, many=False)
-            return Response(serializer.data)
+#             serializer = InventorySerializer(owned_book, many=False)
+#             return Response(serializer.data)
             
     
 # class WishlistView(APIVIew):
@@ -281,7 +315,24 @@ class InventoryView(APIView):
         
         
 class TradesView(APIView):
+    """
+    get: 
+    Return information about the trades for a given user.
+    
+    patch: 
+    Switches is_accepted status between true or false, thus rejecting or 
+    accepting trade.
+    
+    post:
+    Submit a new trade request.
+    
+    delete:
+    Cancels a trade.
+    """
+    
     serializer_class = TradesSerializer
+    
+    
     
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : TradesViewSerializer(many=True)}
@@ -291,6 +342,13 @@ class TradesView(APIView):
         user_books = Trades.objects.filter(trader__profile=given_id)
         trades = TradesViewSerializer(user_books, many=True)
         return Response(trades.data)
+        
+    @swagger_auto_schema(
+        responses={
+        status.HTTP_200_OK : TradesSerializer,
+        status.HTTP_400_BAD_REQUEST : openapi.Response(description="Missing information")
+        }
+    )   
         
     def patch(self, request, given_id):
         if given_id is None:
@@ -308,6 +366,14 @@ class TradesView(APIView):
                 return Response(status=status.HTTP_200_OK)
             else:
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @swagger_auto_schema(
+        request_body=TradesSerializer,
+        responses={
+            status.HTTP_200_OK : TradesSerializer,
+            status.HTTP_400_BAD_REQUEST: openapi.Response(description="Missing information")
+            }
+        )
     
     def post(self, request):
         serializer = TradesSerializer(data=request.data)
@@ -330,6 +396,17 @@ class TradesView(APIView):
         
 class RequestsView(APIView):
     
+    """
+    get:
+    Return a list of trades from the receiver's perspective.
+    
+    put: 
+    Accept or decline the trade by updating the status of the trade. 
+    
+    delete: 
+    Delete the trade. 
+    """
+    
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : TradesSerializer(many=True)}
     )
@@ -338,6 +415,13 @@ class RequestsView(APIView):
         user_books = Trades.objects.filter(receiver__profile=given_id)
         trades = TradesSerializer(user_books, many=True)
         return Response(trades.data)
+    
+    @swagger_auto_schema(
+        responses={
+        status.HTTP_200_OK : TradesSerializer,
+        status.HTTP_400_BAD_REQUEST : openapi.Response(description="Missing information")
+        }
+    )   
         
     def put(self, request, profile_id):
         trade = Trades.objects.get(id=profile_id)
