@@ -46,14 +46,8 @@ class Profile(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
+    
 
-   
-# class Wishlist(models.Model):
-#     book_id = models.ForeignKey('Books', on_delete=models.CASCADE)
-
-# # class InterestedBooks(models.Model):
-#     book = models.ForeignKey(Books, on_delete=models.CASCADE)
-#     profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
           
 class BooksSerializer(serializers.ModelSerializer):
     class Meta:
@@ -75,7 +69,7 @@ class Trades(models.Model):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ('username', 'email', 'id')
         
         
 class ProfileSerializer(serializers.ModelSerializer):

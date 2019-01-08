@@ -21,7 +21,7 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 JWT_AUTH = {
-    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=1000)
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(seconds=7200)
     }
 
 FIXTURE_ROOT = os.path.join(BASE_DIR, 'fixture/')

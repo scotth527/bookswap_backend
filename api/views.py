@@ -4,11 +4,12 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 # from api.models import Contact, ContactSerializer
-from api.models import Books, Profile, Inventory, Trades
+from api.models import Books, Profile, Inventory, Trades, User
 from api.models import BooksSerializer, ProfileSerializer, InventorySerializer, TradesSerializer
-from api.models import TradeProfileSerializer, TradeInventorySerializer, TradesViewSerializer
+from api.models import TradeProfileSerializer, TradeInventorySerializer, TradesViewSerializer, UserSerializer
 # from api.models import WishlistSerializer, InterestedBooks
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.decorators import api_view, permission_classes
 from django.contrib.auth import authenticate, login
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -18,6 +19,8 @@ class BooksView(APIView):
     get:
     Return a list of all books 
     """
+    
+    permission_classes = (AllowAny,)
     
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : BooksSerializer(many=True)}
@@ -32,7 +35,46 @@ class BooksView(APIView):
             book = Books.objects.all()
             serializer = BooksSerializer(book, many=True)
             return Response(serializer.data)
-            
+
+class CreateUser(APIView): 
+    """
+    post: 
+    Create a new user
+    """
+    permission_classes = (AllowAny,)
+    
+    @swagger_auto_schema(
+        request_body=ProfileSerializer,
+        responses={
+            status.HTTP_200_OK : ProfileSerializer,
+            status.HTTP_400_BAD_REQUEST: openapi.Response(description="Missing information")
+            }
+    )
+    
+    def post(self,request):
+        user = request.data
+        serializer = ProfileSerializer(data=user)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class UserRetrieveUpdateAPIView(APIView):
+ 
+    # Allow only authenticated users to access this url
+    permission_classes = (IsAuthenticated,)
+    serializer_class = UserSerializer
+ 
+    @swagger_auto_schema(
+        responses = {status.HTTP_200_OK : UserSerializer(many=True)}
+    )
+    def get(self, request, *args, **kwargs):
+        # serializer to handle turning our `User` object into something that
+        # can be JSONified and sent to the client.
+        serializer = self.serializer_class(request.user)
+ 
+        return Response(serializer.data, status=status.HTTP_200_OK)
+        
+
+
 class LoginView(APIView):
     """
     get:
@@ -41,6 +83,8 @@ class LoginView(APIView):
     post:
     Authenticate user
     """
+    
+    permission_classes = (AllowAny,)
     
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : ProfileSerializer(many=False)}
@@ -84,6 +128,8 @@ class ProfileView(APIView):
     Delete user profile
     
     """
+    
+    permission_classes = (IsAuthenticated,)
     
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : ProfileSerializer(many=False)}
@@ -179,6 +225,7 @@ class LibraryView(APIView):
     Add a book to the users inventory
     
     """
+    permission_classes = (IsAuthenticated,)
     
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : TradeInventorySerializer(many=True)}
@@ -237,6 +284,8 @@ class PageView(APIView):
     
     """
     
+    permission_classes = (IsAuthenticated,)
+    
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : TradeProfileSerializer(many=True)}
     )
@@ -263,6 +312,8 @@ class WishersView(APIView):
     get:
     Return information on users who have the specified book on their wishlist
     """
+    
+    permission_classes = (IsAuthenticated,)
     
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : TradeProfileSerializer(many=True)}
@@ -329,6 +380,8 @@ class TradesView(APIView):
     delete:
     Cancels a trade.
     """
+    
+    permission_classes = (IsAuthenticated,)
     
     serializer_class = TradesSerializer
     
@@ -406,6 +459,8 @@ class RequestsView(APIView):
     delete: 
     Delete the trade. 
     """
+    
+    permission_classes = (IsAuthenticated,)
     
     @swagger_auto_schema(
         responses={ status.HTTP_200_OK : TradesSerializer(many=True)}

@@ -23,6 +23,8 @@ urlpatterns = [
     # path('profile/<int:profile_id>', views.ProfileView.as_view(), name='id-users'),
     # path('contacts/', views.ContactsView.as_view(), name='all-contacts'),
     path('login/', obtain_jwt_token),
+    path('register/', views.CreateUser.as_view(), name="register"),
+    path('retrieveuser/',views.UserRetrieveUpdateAPIView.as_view(), name="retrieve_user"),
     # path('', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     #path('requests/', views.RequestsView.as_view(), name="add-request"),
     path('requests/<int:given_id>', views.RequestsView.as_view(), name='given_id'),
