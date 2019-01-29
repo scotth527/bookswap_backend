@@ -1,4 +1,4 @@
-from rest_framework import serializers
+from rest_framework import serializers, status
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -34,7 +34,7 @@ class Profile(models.Model):
         Books,
         blank=True,
         related_name="owners",
-        through='Inventory',
+        through='Inventory'
     )
     wishlist = models.ManyToManyField(
         Books,
@@ -69,15 +69,27 @@ class Trades(models.Model):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('username', 'email', 'id')
+        fields = ('username', 'email', 'password', 'id')
         
         
 class ProfileSerializer(serializers.ModelSerializer):
     wishlist = serializers.PrimaryKeyRelatedField(many=True, read_only=False, queryset=Books.objects.all())
-    user=UserSerializer()
+    user=UserSerializer(required=True)
     class Meta:
         model = Profile
         exclude = ()
+        
+    def create(self, validated_data):
+        user_data = validated_data.pop('user')
+        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+        profile, created = Profile.objects.update_or_create(user=user, 
+            first_name=validated_data.pop('first_name'), 
+            last_name=validated_data.pop('last_name'), address=validated_data.pop('address'), 
+            city=validated_data.pop('city'), state=validated_data.pop('state'), 
+            birthday=validated_data.pop('birthday'), 
+            favorite_genre=validated_data.pop('favorite_genre'), 
+        )
+        return profile
         
 
 class TradeProfileSerializer(serializers.ModelSerializer):
