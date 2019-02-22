@@ -20,6 +20,8 @@ class Books(models.Model):
     language = models.CharField(max_length=50)
     description = models.CharField(max_length=1000)
     image = models.CharField(max_length=1000, default="https://images.gr-assets.com/books/1388190055l/10048834.jpg")
+    class Meta: 
+        verbose_name_plural = "Books"
     
 
 class Profile(models.Model):
@@ -64,6 +66,8 @@ class Trades(models.Model):
     trader = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name="trader")
     requester = models.ForeignKey(Inventory, on_delete=models.CASCADE, related_name="requester")
     is_accepted = models.BooleanField(default=False)
+    class Meta: 
+        verbose_name_plural = "Trades"
 
 
 class UserSerializer(serializers.ModelSerializer):
