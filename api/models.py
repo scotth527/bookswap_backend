@@ -9,7 +9,7 @@ from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
-
+from django.contrib.auth.hashers import make_password
 
 # Create your models here. 
 class Books(models.Model):
@@ -74,6 +74,9 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'password', 'id')
+        extra_kwargs = {"password":
+                            {"write_only":True}
+                            }
         
         
 class ProfileSerializer(serializers.ModelSerializer):
@@ -84,8 +87,8 @@ class ProfileSerializer(serializers.ModelSerializer):
         exclude = ()
         
     def create(self, validated_data):
-        user_data = validated_data.pop('user')
-        user = UserSerializer.create(UserSerializer(), validated_data=user_data)
+
+        user = User.objects.create_user(**validated_data.pop('user'))
         profile, created = Profile.objects.update_or_create(user=user, 
             first_name=validated_data.pop('first_name'), 
             last_name=validated_data.pop('last_name'), address=validated_data.pop('address'), 
