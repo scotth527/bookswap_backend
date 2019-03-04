@@ -152,19 +152,4 @@ class TradesViewSerializer(serializers.ModelSerializer):
         exclude = () 
  
         
-# class WishlistSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = InterestedBooks
-#         exclude = ()
-# class WishlistSerializer(serializers.ModelSerializer):
-#     class Meta: 
-#         model = Wishlist
-#         exclude = ()
-        
-# class PersonalInventorySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = PersonalInventory
-#         exclude = ()
-
-        
         
