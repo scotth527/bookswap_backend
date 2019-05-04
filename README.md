@@ -1,3 +1,15 @@
+# Django/Python Rest API for Book Swap 
+
+A swagger documented back end with custom endpoints that allow users to create, read, update, delete entries for their library/wishlist,trades etc. 
+
+![Image](./screenshot.png)
+
+
+Built from the 4GeeksAcademy Django Python starter template here: [https://github.com/4GeeksAcademy/django-rest-hello](https://github.com/4GeeksAcademy/django-rest-hello)
+
+
+
+
 # API Starter Template (Python & Django REST)
 
 A django-rest boilerplate for 4Geeks Academy students. It features ready-for-deployment on heroku instructions.

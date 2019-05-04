@@ -12,6 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django.contrib.auth.hashers import make_password
 
 # Create your models here. 
+
 class Books(models.Model):
     api_id = models.CharField(max_length=50)
     title = models.CharField(max_length=50)
