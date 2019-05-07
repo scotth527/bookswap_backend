@@ -12,15 +12,45 @@ from drf_yasg.utils import swagger_auto_schema
 from django.contrib.auth.hashers import make_password
 
 # Create your models here. 
-
+GENRE_CHOICES = (
+    ('Science Fiction', 'Science Fiction'),
+    ('Biography', 'Biography'),
+    ('Classics', 'Classics'),
+    ('Horror', 'Horror'),
+    ('Comedy', 'Comedy'),
+    ('Fantasy', 'Fantasy'),
+    ('Romance', 'Romance'),
+) 
 class Books(models.Model):
+    ENGLISH = 'EN'
+    SPANISH = 'SP'
+    FRENCH = 'FR'
+    CHINESE = 'CH'
+    JAPANESE = 'JP'
+    KOREAN = 'KN'
+    ARABIC = 'AR'
+    LANGUAGE_CHOICES = (
+        (ENGLISH, 'English'),
+        (SPANISH, 'Spanish'),
+        (FRENCH, 'French'),
+        (CHINESE, 'Chinese'),
+        (JAPANESE, 'Japanese'),
+        (KOREAN, 'Korean'),
+        (ARABIC, 'Arabic'),
+    )
+ 
     api_id = models.CharField(max_length=50)
     title = models.CharField(max_length=50)
     author = models.CharField(max_length=50)
-    genre = models.CharField(max_length=50)
-    language = models.CharField(max_length=50)
+    genre = models.CharField(max_length=50,
+        choices=GENRE_CHOICES,
+        default='Fantasy',)
+    language = models.CharField(max_length=2,
+        choices=LANGUAGE_CHOICES,
+        default=ENGLISH,)
     description = models.CharField(max_length=1000)
     image = models.CharField(max_length=1000, default="https://images.gr-assets.com/books/1388190055l/10048834.jpg")
+    thumbnail = models.CharField(max_length=1000, default="https://vinniefisher.com/wp-content/uploads/2016/07/CEOMindset-Book-Thumbnail-Listings.png")
     class Meta: 
         verbose_name_plural = "Books"
     
@@ -32,7 +62,9 @@ class Profile(models.Model):
     city = models.CharField(max_length=50, default="Miami")
     state = models.CharField(max_length=50, default="FL")
     birthday = models.DateField(auto_now=False, auto_now_add=False)
-    favorite_genre = models.CharField(max_length=50)
+    favorite_genre = models.CharField(max_length=50,
+        choices=GENRE_CHOICES,
+        default='Fantasy',)
     library = models.ManyToManyField(
         Books,
         blank=True,
