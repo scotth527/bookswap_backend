@@ -166,10 +166,10 @@ class TradeViewInventorySerializer(serializers.ModelSerializer):
         exclude = ()        
       
 class TradesSerializer(serializers.ModelSerializer):
-    trader = TradeInventorySerializer()
-    requester = TradeInventorySerializer()
+    # trader = TradeInventorySerializer()
+    # requester = TradeInventorySerializer()
     
-    trader__profile = TradeProfileSerializer()
+    # trader__profile = TradeProfileSerializer()
     
     class Meta:
         model = Trades

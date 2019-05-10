@@ -336,19 +336,19 @@ class WishersView(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
   
-# class InventoryView(APIView):
+class InventoryView(APIView):
     
-#     def get(self, request, book_id=None, profile_id=None):
-#         if book_id is None or profile_id is None:
-#             return Response(status=status.HTTP_400_BAD_REQUEST)
-#         else:
-#             try:
-#                 owned_book = Inventory.objects.get(book=book_id, profile=profile_id)
-#             except Inventory.DoesNotExist:
-#                 return Response(status=status.HTTP_404_NOT_FOUND)
+    def get(self, request, book_id=None, profile_id=None):
+        if book_id is None or profile_id is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        else:
+            try:
+                owned_book = Inventory.objects.get(book=book_id, profile=profile_id)
+            except Inventory.DoesNotExist:
+                return Response(status=status.HTTP_404_NOT_FOUND)
                 
-#             serializer = InventorySerializer(owned_book, many=False)
-#             return Response(serializer.data)
+            serializer = InventorySerializer(owned_book, many=False)
+            return Response(serializer.data)
             
     
 # class WishlistView(APIVIew):
